@@ -1,0 +1,11 @@
+.side-bar-container{
+    border: 2px solid gray;
+    padding: 20px 20px;
+    height: 100%;
+}
+
+.node-container {
+    border: 2px solid #6E7796;
+    margin: 10px 10px;
+    padding: 10px 10px;
+}

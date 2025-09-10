@@ -1,0 +1,15 @@
+.main-container {
+    display: flex;
+    height: calc(100vh - 75px);
+
+}
+
+
+.flow-canvas-container {
+  flex: 1;
+}
+
+.side-panel-container {
+  width: 240px;
+  border-left: 1px solid #e2e2e2;
+}

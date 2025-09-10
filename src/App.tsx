@@ -1,5 +1,6 @@
 import "./App.css";
-import {Home} from "./pages/home";
+import '@xyflow/react/dist/style.css';
+import {Home} from "./pages/Home";
 
 function App() {
   return (
