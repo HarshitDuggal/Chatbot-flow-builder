@@ -6,22 +6,35 @@ import {
   type Edge,
   addEdge,
   type Connection,
-  type NodeProps,
-  useNodesState,
-  useEdgesState,
+  type OnNodesChange,
+  type OnEdgesChange,
 } from "@xyflow/react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
 import MessageNode from "../CustomNode/CustomNode";
 
-
-const CanvasScreen = () => {
+const CanvasScreen = ({
+  nodes,
+  setNodes,
+  edges,
+  setEdges,
+  onNodesChange,
+  onEdgesChange,
+  setSelectedNodeId,
+  setIsEditing,
+}: {
+  nodes: FlowNode[];
+  setNodes: Dispatch<SetStateAction<FlowNode[]>>;
+  onNodesChange: OnNodesChange;
+  edges: Edge[];
+  setEdges: Dispatch<SetStateAction<Edge[]>>;
+  onEdgesChange: OnEdgesChange;
+  setSelectedNodeId: Dispatch<SetStateAction<string | undefined>>;
+  setIsEditing: Dispatch<SetStateAction<boolean>>;
+}) => {
   // Annotate nodes and edges with proper types
-  const [nodes, setNodes, onNodesChange] = useNodesState<FlowNode>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-const nodeTypes = {
-  messageNode: MessageNode
-};
+  const nodeTypes = {
+    messageNode: MessageNode,
+  };
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
 
   const onDrop = useCallback((event: React.DragEvent) => {
@@ -55,11 +68,32 @@ const nodeTypes = {
     event.dataTransfer.dropEffect = "move";
   }, []);
   const onConnect = useCallback(
-  (params:Connection) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-  [],
-);
+    (params: Connection) =>
+      setEdges((edgesSnapshot) => {
+        const updatedEdges = addEdge(params, edgesSnapshot);
+        return updatedEdges;
+      }),
+    []
+  );
 
+  const isValidConnection = useCallback(
+    (connection: Connection | Edge) => {
+      console.log("here", "source" in connection && "target" in connection);
 
+      if ("source" in connection && "target" in connection) {
+        const alreadyConnected = edges.some(
+          (e) =>
+            e.source === connection.source || e.target === connection.target
+        );
+
+        if (alreadyConnected) {
+          return false;
+        }
+      }
+      return true;
+    },
+    [edges]
+  );
 
   return (
     <div style={{ height: "100%", width: "100%" }} ref={reactFlowWrapper}>
@@ -67,7 +101,15 @@ const nodeTypes = {
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
-        onNodeClick={(event, node) => setSelectedNodeId(node.id)}
+        onNodeClick={(_, node) => {
+          setIsEditing(true);
+          setSelectedNodeId(node.id);
+        }}
+        onPaneClick={() => {
+          setIsEditing(false);
+          setSelectedNodeId(undefined);
+        }}
+        isValidConnection={isValidConnection}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onDrop={onDrop}
