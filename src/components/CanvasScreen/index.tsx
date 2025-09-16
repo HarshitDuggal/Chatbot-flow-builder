@@ -9,7 +9,7 @@ import {
   type OnEdgesChange,
 } from "@xyflow/react";
 import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
-import type { MessageNodeData } from "../../pages/Home/index";
+import type { MessageNodeData } from "../../pages/home/index";
 import MessageNode from "../CustomNode/customNode";
 
 const CanvasScreen = ({
