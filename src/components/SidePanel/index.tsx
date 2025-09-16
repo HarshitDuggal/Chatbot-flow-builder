@@ -1,7 +1,7 @@
 import { type Dispatch, type SetStateAction } from "react";
 import "./SidePanel.styles.css";
 import { LuMessageCircleMore } from "react-icons/lu";
-import type { MessageNodeData } from "../../pages/Home/index.tsx";
+import type { MessageNodeData } from "../../pages/Home/index";
 
 function Sidepanel({
   isEditing,

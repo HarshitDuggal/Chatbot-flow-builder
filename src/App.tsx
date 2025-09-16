@@ -1,6 +1,6 @@
 import "./App.css";
 import "@xyflow/react/dist/style.css";
-import { Home } from "./pages/Home/index.tsx";
+import { Home } from "./pages/Home/index";
 import { Toaster } from "react-hot-toast";
 
 function App() {

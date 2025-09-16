@@ -3,7 +3,7 @@ import { type Edge } from "@xyflow/react";
 import "./Header.styles.css";
 import { saveToStorage } from "../../utility/localStorage";
 import { toast } from "react-hot-toast";
-import type { MessageNodeData } from "../../pages/Home/index.tsx";
+import type { MessageNodeData } from "../../pages/Home/index";
 
 const Header = ({
   setNodes,
