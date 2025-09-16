@@ -10,7 +10,7 @@ import {
 } from "@xyflow/react";
 import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
 import type { MessageNodeData } from "../../pages/home/index";
-import MessageNode from "../CustomNode/customNode";
+import MessageNode from "../CustomNode/CustomNode";
 
 const CanvasScreen = ({
   nodes,
