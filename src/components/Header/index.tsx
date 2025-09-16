@@ -31,10 +31,9 @@ const Header = ({
       //called to save to storage utility function
       saveToStorage("nodeData", updatedNodes);
       saveToStorage("edgeData", edges);
-      toast.success("Changes saved successfully!");
       return updatedNodes;
     });
-
+    toast.success("Changes saved successfully!");
     // Reset editing states
     setIsEditing(false);
     // Empty the draft as edit is discarded
