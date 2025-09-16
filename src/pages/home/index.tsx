@@ -1,30 +1,36 @@
-import { type Edge, useEdgesState, useNodesState, type Node as FlowNode } from "@xyflow/react";
-import CanvasScreen from "../../components/CanvasScreen.tsx/CanvasScreen";
-import Sidepanel from "../../components/SidePanel/SidePanel";
-import Header from "../../components/Header/Header";
+import {
+  type Edge,
+  useEdgesState,
+  useNodesState,
+  type Node as FlowNode,
+} from "@xyflow/react";
+import CanvasScreen from "../../components/CanvasScreen";
+import Sidepanel from "../../components/SidePanel";
+import Header from "../../components/Header";
 import { useEffect, useState } from "react";
 import "./index.css";
-import { getFromStorage } from "../../utility/loaclStorage";
+import { getFromStorage } from "../../utility/localStorage";
+
+export type MessageNodeData = FlowNode<{ label: string }, "messageNode">;
 
 export const Home = () => {
-  const [nodes, setNodes, onNodesChange] = useNodesState<FlowNode>([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<MessageNodeData>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string>();
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [draftLabel, setDraftLabel] = useState<string>('');
+  const [draftLabel, setDraftLabel] = useState<string>("");
+  const [prevValue, setPrevValue] = useState<string>("");
+  useEffect(() => {
+    const nodesFromStorage = getFromStorage<MessageNodeData[]>("nodeData", []);
+    const edgesFromStorage = getFromStorage<Edge[]>("edgeData", []);
+    if (nodesFromStorage.length > 0) {
+      setNodes(nodesFromStorage);
 
-useEffect(() => {
-  const nodesFromStorage = getFromStorage<FlowNode[]>("nodeData", []);
-  const edgesFromStorage = getFromStorage<Edge[]>("edgeData", []);
-
-  if (nodesFromStorage.length > 0) {
-    setNodes(nodesFromStorage);
-
-    if (edgesFromStorage.length > 0) {
-      setEdges(edgesFromStorage);
+      if (edgesFromStorage.length > 0) {
+        setEdges(edgesFromStorage);
+      }
     }
-  }
-}, []);
+  }, []);
 
   return (
     <div>
@@ -35,7 +41,8 @@ useEffect(() => {
         selectedNodeId={selectedNodeId}
         draftLabel={draftLabel}
         setDraftLabel={setDraftLabel}
-        setIsEditing={setIsEditing} />
+        setIsEditing={setIsEditing}
+      />
       <div className="main-container">
         <div className="flow-canvas-container">
           <CanvasScreen
@@ -46,13 +53,22 @@ useEffect(() => {
             onEdgesChange={onEdgesChange}
             onNodesChange={onNodesChange}
             setSelectedNodeId={setSelectedNodeId}
-            setIsEditing={setIsEditing} />
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
+            selectedNodeId={selectedNodeId}
+            prevValue={prevValue}
+            setPrevValue={setPrevValue}
+            setDraftLabel={setDraftLabel}
+          />
         </div>
         <div className="side-panel-container">
           <Sidepanel
             isEditing={isEditing}
             draftLabel={draftLabel}
-            setDraftLabel={setDraftLabel} />
+            setDraftLabel={setDraftLabel}
+            setNodes={setNodes}
+            selectedNodeId={selectedNodeId}
+          />
         </div>
       </div>
     </div>

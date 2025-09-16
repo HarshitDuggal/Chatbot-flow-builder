@@ -2,7 +2,6 @@ import {
   Background,
   Controls,
   ReactFlow,
-  type Node as FlowNode,
   type Edge,
   addEdge,
   type Connection,
@@ -10,6 +9,7 @@ import {
   type OnEdgesChange,
 } from "@xyflow/react";
 import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
+import type { MessageNodeData } from "../../pages/Home";
 import MessageNode from "../CustomNode/CustomNode";
 
 const CanvasScreen = ({
@@ -20,16 +20,26 @@ const CanvasScreen = ({
   onNodesChange,
   onEdgesChange,
   setSelectedNodeId,
+  selectedNodeId,
+  isEditing,
   setIsEditing,
+  setPrevValue,
+  prevValue,
+  setDraftLabel,
 }: {
-  nodes: FlowNode[];
-  setNodes: Dispatch<SetStateAction<FlowNode[]>>;
-  onNodesChange: OnNodesChange;
+  nodes: MessageNodeData[];
+  setNodes: Dispatch<SetStateAction<MessageNodeData[]>>;
+  onNodesChange: OnNodesChange<MessageNodeData>;
   edges: Edge[];
   setEdges: Dispatch<SetStateAction<Edge[]>>;
   onEdgesChange: OnEdgesChange;
+  selectedNodeId?: string;
   setSelectedNodeId: Dispatch<SetStateAction<string | undefined>>;
+  isEditing: boolean;
   setIsEditing: Dispatch<SetStateAction<boolean>>;
+  setPrevValue: Dispatch<SetStateAction<string>>;
+  prevValue: string;
+  setDraftLabel: Dispatch<SetStateAction<string>>;
 }) => {
   // Annotate nodes and edges with proper types
   const nodeTypes = {
@@ -52,7 +62,7 @@ const CanvasScreen = ({
       y: event.clientY - reactFlowBounds.top,
     };
 
-    const newNode: FlowNode = {
+    const newNode: MessageNodeData = {
       id: `node_${+new Date()}`,
       type: "messageNode",
       position,
@@ -104,10 +114,20 @@ const CanvasScreen = ({
         onNodeClick={(_, node) => {
           setIsEditing(true);
           setSelectedNodeId(node.id);
+          setPrevValue(node.data.label);
         }}
         onPaneClick={() => {
+          if (isEditing && selectedNodeId)
+            setNodes((nds) =>
+              nds.map((node) =>
+                node.id === selectedNodeId
+                  ? { ...node, data: { ...node.data, label: prevValue } }
+                  : node
+              )
+            );
           setIsEditing(false);
           setSelectedNodeId(undefined);
+          setDraftLabel("");
         }}
         isValidConnection={isValidConnection}
         onNodesChange={onNodesChange}

@@ -1,5 +1,23 @@
-.header-continer{
+.header-continer {
     background-color: #F3F3F3;
     display: flex;
     justify-content: space-between;
+    align-items: center; 
+    padding: 16px;
 }
+
+.save-changes-btn {
+    border: 2px solid #7073b3;    
+    color: #7073b3;               
+    background: white;              
+    padding: 7px 28px;              
+    border-radius: 10px;           
+    font-weight: 500;              
+    font-size: 1rem;               
+    cursor: pointer;                
+    box-shadow: none;               
+    outline: none;                 
+    transition: background 0.2s, color 0.2s;
+}
+
+
