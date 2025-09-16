@@ -1,9 +1,10 @@
-import { type NodeProps, type Node, Handle, Position } from "@xyflow/react";
+import { type NodeProps, Handle, Position } from "@xyflow/react";
 import { FaWhatsapp } from "react-icons/fa";
 import { RiMessage3Line } from "react-icons/ri";
 import type { MessageNodeData } from "../../pages/Home";
 
 const MessageNode = ({ data, selected }: NodeProps<MessageNodeData>) => {
+  //Made Cutom node ui for design purpose
   return (
     <div
       style={{

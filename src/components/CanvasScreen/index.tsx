@@ -41,27 +41,33 @@ const CanvasScreen = ({
   prevValue: string;
   setDraftLabel: Dispatch<SetStateAction<string>>;
 }) => {
-  // Annotate nodes and edges with proper types
+  // Annotating nodes and edges with proper types
   const nodeTypes = {
     messageNode: MessageNode,
   };
+
+  // | null is there because useRef starts as null and only later points to the DOM element.
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
 
   const onDrop = useCallback((event: React.DragEvent) => {
     event.preventDefault();
 
-    // Use non-null assertion or optional chaining to avoid null error
+    // Using non-null assertion or optional chaining to avoid null error
     const reactFlowBounds = reactFlowWrapper.current?.getBoundingClientRect();
-    if (!reactFlowBounds) return; // Guard if null
+    if (!reactFlowBounds) return; // Guard for null
 
     const type = event.dataTransfer.getData("application/reactflow");
     if (!type) return;
 
+    //setting drop position of node
     const position = {
       x: event.clientX - reactFlowBounds.left,
       y: event.clientY - reactFlowBounds.top,
     };
 
+    // Creating new node of type MessageNodeData
+    // also we can add more types of nodes by adding type property and handling in nodeTypes object
+    // currently only one type is there so hardcoded
     const newNode: MessageNodeData = {
       id: `node_${+new Date()}`,
       type: "messageNode",
@@ -77,6 +83,8 @@ const CanvasScreen = ({
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }, []);
+
+  // Handling connecting an edge connection between nodes
   const onConnect = useCallback(
     (params: Connection) =>
       setEdges((edgesSnapshot) => {
@@ -88,8 +96,7 @@ const CanvasScreen = ({
 
   const isValidConnection = useCallback(
     (connection: Connection | Edge) => {
-      console.log("here", "source" in connection && "target" in connection);
-
+      // Ensuring that a node can have only one incoming or outgoing connection
       if ("source" in connection && "target" in connection) {
         const alreadyConnected = edges.some(
           (e) =>
@@ -105,30 +112,50 @@ const CanvasScreen = ({
     [edges]
   );
 
+const handleNodeClick = (node:  MessageNodeData) => {
+  if (isEditing && selectedNodeId && selectedNodeId !== node.id) {
+    // Reset the previous node back to its old value
+    // when a node is selected and we click another node while editing it will discard the changes of previous node
+    setDraftLabel("");
+    setNodes((nds) =>
+      nds.map((n) =>
+        n.id === selectedNodeId
+          ? { ...n, data: { ...n.data, label: prevValue } }
+          : n
+      )
+    );
+  }
+  setIsEditing(true);
+  setSelectedNodeId(node.id);
+  setPrevValue(node.data.label);
+};
+
+const handlePaneClick = () => {
+  if (isEditing && selectedNodeId) {
+    // Reset the node back to its old value
+    // when we click on background while editing it will discard the changes
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === selectedNodeId
+          ? { ...node, data: { ...node.data, label: prevValue } }
+          : node
+      )
+    );
+  }
+  setIsEditing(false);
+  setSelectedNodeId(undefined);
+  setDraftLabel("");
+};
+
+
   return (
     <div style={{ height: "100%", width: "100%" }} ref={reactFlowWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
-        onNodeClick={(_, node) => {
-          setIsEditing(true);
-          setSelectedNodeId(node.id);
-          setPrevValue(node.data.label);
-        }}
-        onPaneClick={() => {
-          if (isEditing && selectedNodeId)
-            setNodes((nds) =>
-              nds.map((node) =>
-                node.id === selectedNodeId
-                  ? { ...node, data: { ...node.data, label: prevValue } }
-                  : node
-              )
-            );
-          setIsEditing(false);
-          setSelectedNodeId(undefined);
-          setDraftLabel("");
-        }}
+        onNodeClick={(_, node) => handleNodeClick(node)}
+        onPaneClick={handlePaneClick}
         isValidConnection={isValidConnection}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
